@@ -1,13 +1,14 @@
 <template>
-  
+  <Form></Form>
 </template>
 
 <script>
-export default {
+import Form from "../components/Form.vue";
 
-}
+export default {
+  components: { Form },
+  //TODO: questions array to local storage
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
