@@ -1,27 +1,6 @@
 <template>
   <form class="question-form" @submit.prevent>
     <input type="text" class="question__field" v-model="this.question.title" />
-    <div class="question-type-wrapper">
-      <input
-        class="form__checkbox"
-        type="radio"
-        id="single-answer"
-        name="type-answer"
-        value="single"
-        v-model="this.question.type"
-        @change="blankCorrect"
-      />
-      <label for="single-answer">Single answer</label>
-      <input
-        class="form__checkbox"
-        type="radio"
-        id="multiple-answer"
-        name="type-answer"
-        value="multiple"
-        v-model="this.question.type"
-      />
-      <label for="multiple-answer">Multiple answer</label>
-    </div>
     <div class="answers">
       <div
         class="answer"
@@ -35,21 +14,10 @@
           @blur="(event) => (answer.title = event.target.value)"
         />
         <input
-          v-if="this.question.type === 'multiple'"
-          name="answer"
+          name="answerMultiple"
           type="checkbox"
           class="form__checkbox"
           v-model="answer.isCorrect"
-        />
-        <input
-          v-else
-          type="radio"
-          class="form__checkbox"
-          name="answer"
-          v-model="answer.isCorrect"
-          value="true"
-          @blur="(event) => (answer.isCorrect = false)"
-          @change="(event) => (answer.isCorrect = true)"
         />
       </div>
       <button class="add-answer button" @click="addAnswer">add answer</button>
@@ -66,33 +34,61 @@ export default {
     return {
       question: {
         title: "",
-        type: "",
-        answers: [{ title: "c" }, {}, {}, {}],
+        answers: [
+          { title: "", isCorrect: false },
+          { title: "", isCorrect: false },
+          { title: "", isCorrect: false },
+          { title: "", isCorrect: false },
+        ],
         correct: [],
       },
     };
   },
   methods: {
     addAnswer() {
-      this.question.answers.push({});
+      this.question.answers.push(
+          { title: "", isCorrect: false });
     },
     check() {
-      //TODO: validate blankliness
-      return false;
+      if (this.question.title === "") {
+        alert("blank title");
+        return false;
+      }
+      let singularity = false;
+      for (const answer of this.question.answers) {
+        if (answer.title === "") {
+          alert("answer title is blank");
+          return false;
+        }
+        if (answer.isCorrect) {
+          singularity = answer.isCorrect;
+        }
+      }
+      if (!singularity) {
+        alert("no correct answer was selected");
+        return false;
+      }
+      return true;
     },
     addCorrectAnswers() {
-      //TODO: adding correct answers
-    },   
+      if (this.question.correct.length !== 0) {
+        this.question.correct.length = [];
+      }
+      for (const answer of this.question.answers) {
+        if (answer.isCorrect) {
+          this.question.correct.push(answer);
+        }
+      }
+      alert(this.question.correct);
+    },
     pushQuestion() {
-      if (!this.check) {
-        alert("something wrong!");
+      if (!this.check()) {
+        return;
       }
       this.addCorrectAnswers();
       //TODO: push question to parent
-      this.clearFields();
-    },
-    clearFields() {
-      //TODO: refreshing inputs
+      
+      location.reload();
     },
     blankCorrect() {
       this.question.answers.forEach((answer) => {
